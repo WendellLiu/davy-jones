@@ -1,11 +1,23 @@
 extern crate hyper;
 extern crate pretty_env_logger;
 
+mod claims;
 use hyper::rt::{self, Future};
 use hyper::service::service_fn_ok;
 use hyper::{Body, Request, Response, Server};
+use std::time::SystemTime;
 
 fn main() {
+    let example_option: claims::Claims = claims::Claims {
+        r_pre: Some(String::from("cweb")),
+        r_suf: None,
+        pg: true,
+        p_bran: String::from("master"),
+        repo: String::from("cweb"),
+        iss: String::from("davy-jones"),
+        iat: SystemTime::now(),
+    };
+    print!("{}", example_option);
     pretty_env_logger::init();
     let addr = ([127, 0, 0, 1], 8000).into();
 
