@@ -1,0 +1,26 @@
+replicaCount: 1
+env: staging
+image:
+  repository: nginx
+  tag: 1.7.9
+  pullPolicy: Always
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 56Mi
+  requests:
+    cpu: 100m
+    memory: 56Mi
+
+service:
+  type: ClusterIP
+  externalPort: 3030
+  internalPort: 3030
+  name: http
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
