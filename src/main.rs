@@ -16,7 +16,7 @@ use claims::Claims;
 use hyper::rt::{self, Future};
 use hyper::service::service_fn_ok;
 use hyper::{Body, Request, Response, Server};
-use jwt::{decode, encode, Header};
+use jwt::{decode, encode, Header, TokenData, Validation};
 use std::env;
 
 fn main() {
@@ -43,11 +43,18 @@ fn main() {
     let token = encode(&Header::default(), &example_claims, secret.as_ref()).unwrap();
     println!("token = {}", token);
 
-    let serialized = serde_json::to_string(&example_claims).unwrap();
-    println!("serialized = {}", serialized);
+    let validation = Validation {
+        validate_exp: false,
+        ..Default::default()
+    };
 
-    let deserialized: Claims = serde_json::from_str(&serialized).unwrap();
-    println!("deserialized = {:?}", deserialized);
+    let token_data = decode::<Claims>(&token, secret.as_ref(), &validation);
+
+    match token_data {
+        Ok(TokenData { claims, .. }) => println!("decoded claims = {:?}", claims),
+        Err(e) => println!("fail to parse the token, error = {:?}", e),
+    }
+
     pretty_env_logger::init();
     let addr = ([127, 0, 0, 1], 8000).into();
 
