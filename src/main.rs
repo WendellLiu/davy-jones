@@ -1,14 +1,31 @@
 extern crate hyper;
 extern crate pretty_env_logger;
 
+#[cfg(not(feature = "production"))]
+extern crate dotenv;
+
+#[cfg(not(feature = "production"))]
+use dotenv::dotenv;
+
 mod claims;
+
+use claims::Claims;
 use hyper::rt::{self, Future};
 use hyper::service::service_fn_ok;
 use hyper::{Body, Request, Response, Server};
+use std::env;
 use std::time::SystemTime;
 
 fn main() {
-    let example_option: claims::Claims = claims::Claims {
+    #[cfg(not(feature = "production"))]
+    dotenv().ok();
+
+    match env::var("secret") {
+        Ok(val) => println!("{}: {:?}", "secret", val),
+        Err(e) => println!("couldn't interpret {}: {}", "secret", e),
+    }
+
+    let example_option: Claims = Claims {
         r_pre: Some(String::from("cweb")),
         r_suf: None,
         pg: true,
@@ -20,7 +37,7 @@ fn main() {
     let serialized = serde_json::to_string(&example_option).unwrap();
     println!("serialized = {}", serialized);
 
-    let deserialized: claims::Claims = serde_json::from_str(&serialized).unwrap();
+    let deserialized: Claims = serde_json::from_str(&serialized).unwrap();
     println!("deserialized = {:?}", deserialized);
     pretty_env_logger::init();
     let addr = ([127, 0, 0, 1], 8000).into();
