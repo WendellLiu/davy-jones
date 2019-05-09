@@ -17,7 +17,11 @@ fn main() {
         iss: String::from("davy-jones"),
         iat: SystemTime::now(),
     };
-    print!("{}", example_option);
+    let serialized = serde_json::to_string(&example_option).unwrap();
+    println!("serialized = {}", serialized);
+
+    let deserialized: claims::Claims = serde_json::from_str(&serialized).unwrap();
+    println!("deserialized = {:?}", deserialized);
     pretty_env_logger::init();
     let addr = ([127, 0, 0, 1], 8000).into();
 
