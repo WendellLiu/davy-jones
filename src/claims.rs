@@ -1,5 +1,5 @@
+use chrono::Utc;
 use serde_derive::{Deserialize, Serialize};
-use std::time::SystemTime;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Claims {
@@ -16,7 +16,7 @@ pub struct Claims {
   // Issuer
   pub iss: String,
   // Issued At
-  pub iat: SystemTime,
+  pub iat: chrono::DateTime<Utc>,
 }
 
 impl std::fmt::Display for Claims {
