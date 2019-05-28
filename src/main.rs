@@ -1,8 +1,11 @@
+#![feature(proc_macro_hygiene, decl_macro)]
+
 extern crate chrono;
-extern crate futures;
-extern crate hyper;
 extern crate jsonwebtoken as jwt;
 extern crate pretty_env_logger;
+
+#[macro_use]
+extern crate rocket;
 
 #[cfg(not(feature = "production"))]
 extern crate dotenv;
@@ -11,16 +14,16 @@ extern crate dotenv;
 use dotenv::dotenv;
 
 mod claims;
-mod routes;
 
 use chrono::prelude::*;
 use claims::Claims;
-use hyper::rt::{self, Future};
-use hyper::service::service_fn;
-use hyper::Server;
 use jwt::{decode, encode, Header, TokenData, Validation};
-use routes::router::echo;
 use std::env;
+
+#[get("/")]
+fn index() -> &'static str {
+    "Hello, world!"
+}
 
 fn main() {
     #[cfg(not(feature = "production"))]
@@ -59,14 +62,5 @@ fn main() {
         Err(e) => println!("fail to parse the token, error = {:?}", e),
     }
 
-    pretty_env_logger::init();
-    let addr = ([127, 0, 0, 1], 8000).into();
-
-    let server = Server::bind(&addr)
-        .serve(|| service_fn(echo))
-        .map_err(|e| eprintln!("server error: {}", e));
-
-    println!("Listening on http://{}", addr);
-
-    rt::run(server);
+    rocket::ignite().mount("/", routes![index]).launch();
 }
