@@ -1,4 +1,5 @@
 extern crate chrono;
+extern crate futures;
 extern crate hyper;
 extern crate jsonwebtoken as jwt;
 extern crate pretty_env_logger;
@@ -10,13 +11,15 @@ extern crate dotenv;
 use dotenv::dotenv;
 
 mod claims;
+mod routes;
 
 use chrono::prelude::*;
 use claims::Claims;
 use hyper::rt::{self, Future};
-use hyper::service::service_fn_ok;
-use hyper::{Body, Request, Response, Server};
+use hyper::service::service_fn;
+use hyper::Server;
 use jwt::{decode, encode, Header, TokenData, Validation};
+use routes::router::echo;
 use std::env;
 
 fn main() {
@@ -59,12 +62,7 @@ fn main() {
     let addr = ([127, 0, 0, 1], 8000).into();
 
     let server = Server::bind(&addr)
-        .serve(|| {
-            // This is the `Service` that will handle the connection.
-            // `service_fn_ok` is a helper to convert a function that
-            // returns a Response into a `Service`.
-            service_fn_ok(move |_: Request<Body>| Response::new(Body::from("Hello World!!!")))
-        })
+        .serve(|| service_fn(echo))
         .map_err(|e| eprintln!("server error: {}", e));
 
     println!("Listening on http://{}", addr);
