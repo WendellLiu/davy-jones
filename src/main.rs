@@ -14,16 +14,14 @@ extern crate dotenv;
 use dotenv::dotenv;
 
 mod claims;
+mod routes;
 
+use routes::root;
+use routes::webhook;
 use chrono::prelude::*;
 use claims::Claims;
 use jwt::{decode, encode, Header, TokenData, Validation};
 use std::env;
-
-#[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
-}
 
 fn main() {
     #[cfg(not(feature = "production"))]
@@ -62,5 +60,5 @@ fn main() {
         Err(e) => println!("fail to parse the token, error = {:?}", e),
     }
 
-    rocket::ignite().mount("/", routes![index]).launch();
+    rocket::ignite().mount("/", routes![root::index, webhook::index]).launch();
 }
