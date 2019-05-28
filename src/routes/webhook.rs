@@ -14,6 +14,6 @@ pub fn index(token: &RawStr) -> String {
 
   match token_data {
       Ok(TokenData { claims, .. }) => format!("{}", claims),
-      Err(e) => String::from("error"),
+      Err(e) => format!("error = {:?}", e),
   }
 }

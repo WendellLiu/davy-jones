@@ -20,7 +20,7 @@ use routes::root;
 use routes::webhook;
 use chrono::prelude::*;
 use claims::Claims;
-use jwt::{decode, encode, Header, TokenData, Validation};
+use jwt::{encode, Header};
 use std::env;
 
 fn main() {
@@ -47,18 +47,6 @@ fn main() {
 
     let token = encode(&Header::default(), &example_claims, secret.as_ref()).unwrap();
     println!("token = {}", token);
-
-    let validation = Validation {
-        validate_exp: false,
-        ..Default::default()
-    };
-
-    let token_data = decode::<Claims>(&token, secret.as_ref(), &validation);
-
-    match token_data {
-        Ok(TokenData { claims, .. }) => println!("decoded claims = {:?}", claims),
-        Err(e) => println!("fail to parse the token, error = {:?}", e),
-    }
 
     rocket::ignite().mount("/", routes![root::index, webhook::index]).launch();
 }
