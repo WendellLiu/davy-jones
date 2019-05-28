@@ -17,6 +17,8 @@ pub struct Claims {
   pub iss: String,
   // Issued At
   pub iat: chrono::DateTime<Utc>,
+  // Secret for Webhook
+  pub hd_secr: String,
 }
 
 impl std::fmt::Display for Claims {

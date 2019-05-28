@@ -41,6 +41,7 @@ fn main() {
         repo: String::from("cweb"),
         iss: String::from("davy-jones"),
         iat: Utc::now(),
+        hd_secr: String::from("secret"),
     };
 
     let token = encode(&Header::default(), &example_claims, secret.as_ref()).unwrap();
