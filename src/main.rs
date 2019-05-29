@@ -2,10 +2,10 @@
 
 extern crate chrono;
 extern crate jsonwebtoken as jwt;
-extern crate pretty_env_logger;
 
-#[macro_use]
-extern crate rocket;
+#[macro_use] extern crate rocket;
+#[macro_use] extern crate rocket_contrib;
+
 
 #[cfg(not(feature = "production"))]
 extern crate dotenv;
@@ -45,8 +45,9 @@ fn main() {
         hd_secr: String::from("secret"),
     };
 
+    println!("example claims = {:?}", example_claims);
     let token = encode(&Header::default(), &example_claims, secret.as_ref()).unwrap();
     println!("token = {}", token);
 
-    rocket::ignite().mount("/", routes![root::index, webhook::index]).launch();
+    rocket::ignite().mount("/", routes![root::index, webhook::index, webhook::create_token]).launch();
 }
