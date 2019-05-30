@@ -28,21 +28,22 @@ pub struct CreateTokenData {
 }
 
 #[post("/webhook", format = "json", data = "<_claims>")]
-pub fn create_token(_claims: Json<Claims>) -> Option<Json<CustomResponse<CreateTokenData>>> {
-  let claims = _claims.into_inner();
-  
-  let config = get_config();
-  let Config {
-    secret
-  } = config;
+pub fn create_token(_claims: Json<Claims>) -> 
+  Option<Json<CustomResponse<CreateTokenData>>> {
+    let claims = _claims.into_inner();
+    
+    let config = get_config();
+    let Config {
+      secret
+    } = config;
 
-  let token = encode(&Header::default(), &claims, secret.as_ref()).unwrap();
-  let data = CreateTokenData {
-    token: token
-  };
+    let token = encode(&Header::default(), &claims, secret.as_ref()).unwrap();
+    let data = CreateTokenData {
+      token: token
+    };
 
-  Some(Json(CustomResponse {
-    status: String::from("ok"),
-    data: data
-  }))
-}
+    Some(Json(CustomResponse {
+      status: String::from("ok"),
+      data: data
+    }))
+  }

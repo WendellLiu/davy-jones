@@ -20,5 +20,7 @@ use routes::root;
 use routes::webhook;
 
 fn main() {
-    rocket::ignite().mount("/", routes![root::index, webhook::index, webhook::create_token]).launch();
+  rocket::ignite()
+    .mount("/", routes![root::index, webhook::index, webhook::create_token])
+    .launch();
 }
