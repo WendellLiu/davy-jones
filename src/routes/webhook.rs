@@ -1,6 +1,5 @@
 use rocket::http::RawStr;
 use rocket_contrib::json::{Json};
-use rocket::response::status;
 use jwt::{decode, TokenData, Validation, encode, Header};
 use crate::claims::Claims;
 
@@ -21,20 +20,21 @@ pub fn index(token: &RawStr) -> String {
   }
 }
 
-
-struct Response {
+#[derive(Serialize, Deserialize)]
+pub struct CustomResponse {
   status: String,
   token: String
 }
 
-#[post("/webhook", format = "json", data = "<claims>")]
-pub fn create_token(claims: Json<Claims>) -> Result<Response, status::BadRequest<String>> {
+#[post("/webhook", format = "json", data = "<_claims>")]
+pub fn create_token(_claims: Json<Claims>) -> Option<Json<CustomResponse>> {
+  let claims = _claims.into_inner();
   println!("create the claims = {:?}", claims);
   let secret = String::from("1qaz2wsx");
 
   let token = encode(&Header::default(), &claims, secret.as_ref()).unwrap();
-  Ok(Response {
+  Some(Json(CustomResponse {
     status: String::from("ok"),
     token: token
-  })
+  }))
 }

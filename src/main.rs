@@ -4,7 +4,8 @@ extern crate chrono;
 extern crate jsonwebtoken as jwt;
 
 #[macro_use] extern crate rocket;
-#[macro_use] extern crate rocket_contrib;
+extern crate rocket_contrib;
+#[macro_use] extern crate serde_derive;
 
 
 #[cfg(not(feature = "production"))]
