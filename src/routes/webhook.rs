@@ -3,6 +3,7 @@ use rocket_contrib::json::{Json};
 use jwt::{decode, TokenData, Validation, encode, Header};
 use crate::claims::Claims;
 use crate::config::{get_config, Config};
+use crate::response::{CustomResponse};
 
 
 #[get("/webhook/<token>")]
@@ -22,13 +23,12 @@ pub fn index(token: &RawStr) -> String {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct CustomResponse {
-  status: String,
+pub struct CreateTokenData {
   token: String
 }
 
 #[post("/webhook", format = "json", data = "<_claims>")]
-pub fn create_token(_claims: Json<Claims>) -> Option<Json<CustomResponse>> {
+pub fn create_token(_claims: Json<Claims>) -> Option<Json<CustomResponse<CreateTokenData>>> {
   let claims = _claims.into_inner();
   
   let config = get_config();
@@ -37,8 +37,12 @@ pub fn create_token(_claims: Json<Claims>) -> Option<Json<CustomResponse>> {
   } = config;
 
   let token = encode(&Header::default(), &claims, secret.as_ref()).unwrap();
+  let data = CreateTokenData {
+    token: token
+  };
+
   Some(Json(CustomResponse {
     status: String::from("ok"),
-    token: token
+    data: data
   }))
 }

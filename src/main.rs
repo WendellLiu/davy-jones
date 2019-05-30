@@ -14,6 +14,7 @@ extern crate dotenv;
 mod claims;
 mod routes;
 mod config;
+mod response;
 
 use routes::root;
 use routes::webhook;
