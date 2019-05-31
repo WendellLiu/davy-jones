@@ -12,7 +12,7 @@ pub fn get_config() -> Config {
   #[cfg(not(feature = "production"))]
   dotenv().ok();
 
-  let secret = match env::var("secret") {
+  let secret = match env::var("SECRET") {
     Ok(val) => val,
     Err(_) => String::from("secret"),
   };
