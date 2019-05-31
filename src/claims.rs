@@ -48,7 +48,7 @@ pub fn create_claims(
   repository_name: String,
   webhook_secret: String
 ) -> Claims {
-  return Claims {
+  Claims {
     r_pre: release_name_prefix,
     r_suf: release_name_suffix,
     pg: purge,
@@ -57,5 +57,5 @@ pub fn create_claims(
     iss: String::from("davy-jones"),
     iat: Utc::now(),
     hd_secr: webhook_secret,
-  };
+  }
 }

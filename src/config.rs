@@ -3,7 +3,8 @@ use dotenv::dotenv;
 use std::env;
 
 pub struct Config {
-  pub secret: String
+  pub secret: String,
+  pub kubeconfig_path: String
 }
 
 pub fn get_config() -> Config {
@@ -16,6 +17,7 @@ pub fn get_config() -> Config {
   };
 
   Config {
-    secret
+    secret,
+    kubeconfig_path: String::from("kubeconfig_test.yaml")
   }
 }

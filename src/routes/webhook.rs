@@ -12,13 +12,18 @@ pub fn index(token: &RawStr) -> String {
         validate_exp: false,
         ..Default::default()
     };
-  let secret = String::from("1qaz2wsx");
+
+  let config = get_config();
+  let Config {
+    secret,
+    ..
+  } = config;
 
   let token_data = decode::<Claims>(token.as_str(), secret.as_ref(), &validation);
 
   match token_data {
-      Ok(TokenData { claims, .. }) => format!("{}", claims),
-      Err(e) => format!("error = {:?}", e),
+    Ok(TokenData { claims, .. }) => format!("{}", claims),
+    Err(e) => format!("error = {:?}", e),
   }
 }
 
@@ -52,7 +57,8 @@ pub fn create_token(_payload: Json<CreateTokenPayload>) ->
     
     let config = get_config();
     let Config {
-      secret
+      secret,
+      ..
     } = config;
 
     let token = encode(&Header::default(), &claims, secret.as_ref()).unwrap();
