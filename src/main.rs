@@ -21,10 +21,9 @@ mod kubeconfig;
 
 use routes::root;
 use routes::webhook;
-use kubeconfig::{render_kubeconfig, write_kubeconfig};
+use kubeconfig::{write_kubeconfig};
 
 fn main() {
-  println!("template test: {}", render_kubeconfig(&String::from("Hello {{name}}")));
   write_kubeconfig();
   rocket::ignite()
     .mount("/", routes![root::index, webhook::index, webhook::create_token])
