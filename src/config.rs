@@ -4,6 +4,7 @@ use std::env;
 
 pub struct Config {
   pub secret: String,
+  pub kubeconfig_template_path: String,
   pub kubeconfig_path: String
 }
 
@@ -18,6 +19,7 @@ pub fn get_config() -> Config {
 
   Config {
     secret,
-    kubeconfig_path: String::from("kubeconfig_test.yaml")
+    kubeconfig_template_path: String::from("kubeconfig_template.yaml"),
+    kubeconfig_path: String::from("kubeconfig.yaml")
   }
 }
