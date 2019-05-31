@@ -1,7 +1,7 @@
 use rocket::http::RawStr;
 use rocket_contrib::json::{Json};
 use jwt::{decode, TokenData, Validation, encode, Header};
-use crate::claims::Claims;
+use crate::claims::{Claims, create_claims};
 use crate::config::{get_config, Config};
 use crate::response::{CustomResponse};
 
@@ -23,14 +23,32 @@ pub fn index(token: &RawStr) -> String {
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct CreateTokenPayload {
+  pub release_name_prefix: Option<String>,
+  pub release_name_suffix: Option<String>,
+  pub purge: bool,
+  pub protected_branch_name: Option<String>,
+  pub repository_name: String,
+  pub webhook_secret: String,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct CreateTokenData {
   token: String
 }
 
-#[post("/webhook", format = "json", data = "<_claims>")]
-pub fn create_token(_claims: Json<Claims>) -> 
+#[post("/webhook", format = "json", data = "<_payload>")]
+pub fn create_token(_payload: Json<CreateTokenPayload>) -> 
   Option<Json<CustomResponse<CreateTokenData>>> {
-    let claims = _claims.into_inner();
+    let payload = _payload.into_inner();
+    let claims = create_claims(
+      payload.release_name_prefix, 
+      payload.release_name_suffix,
+      payload.purge,
+      payload.protected_branch_name,
+      payload.repository_name,
+      payload.webhook_secret
+    );
     
     let config = get_config();
     let Config {

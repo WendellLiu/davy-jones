@@ -1,7 +1,7 @@
 use chrono::Utc;
 use serde_derive::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 pub struct Claims {
   // Release Name Prefix
   pub r_pre: Option<String>,
@@ -10,7 +10,7 @@ pub struct Claims {
   // Purge or Not
   pub pg: bool,
   // Protected Branch Name
-  pub p_bran: String,
+  pub p_bran: Option<String>,
   // Repository Name
   pub repo: String,
   // Issuer
@@ -38,4 +38,24 @@ impl std::fmt::Display for Claims {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
     write!(f, "issuer: {}, repo: {}", self.iss, self.repo)
   }
+}
+
+pub fn create_claims(
+  release_name_prefix: Option<String>,
+  release_name_suffix: Option<String>,
+  purge: bool,
+  protected_branch_name: Option<String>,
+  repository_name: String,
+  webhook_secret: String
+) -> Claims {
+  return Claims {
+    r_pre: release_name_prefix,
+    r_suf: release_name_suffix,
+    pg: purge,
+    p_bran: protected_branch_name,
+    repo: repository_name,
+    iss: String::from("davy-jones"),
+    iat: Utc::now(),
+    hd_secr: webhook_secret,
+  };
 }

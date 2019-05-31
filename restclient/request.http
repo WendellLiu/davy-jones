@@ -8,12 +8,10 @@ POST http://localhost:8000/webhook http/1.1
 content-type: application/json
 
 {
-    "r_pre": "cweb-",
-    "r_suf": "",
-    "pg": true,
-    "p_bran": "master",
-    "repo": "Consumer-Web",
-    "iss": "wendell",
-    "iat": "2019-05-29T17:17:45.960077Z",
-    "hd_secr": "2wsx"
+  "release_name_prefix": "cweb-",
+  "release_name_suffix": "",
+  "purge": true,
+  "protected_branch_name": null,
+  "repository_name": "Consumer-Web",
+  "webhook_secret": "2wsx"
 }
