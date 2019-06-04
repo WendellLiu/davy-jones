@@ -1,7 +1,6 @@
 version: '3.7'
 services:
   davy-jones:
-    # image: quay.io/honestbee/cweb:dockerlize-cweb
     build: .
     env_file: ./.env
     ports:

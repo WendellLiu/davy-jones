@@ -9,6 +9,7 @@ pub struct Config {
   pub kube_api_server: String,
   pub kube_namespace: String,
   pub kube_token: String,
+  pub kube_tiller_ns: String
 }
 
 pub fn get_config() -> Config {
@@ -22,17 +23,22 @@ pub fn get_config() -> Config {
 
   let kube_api_server = match env::var("KUBE_API_SERVER") {
     Ok(val) => val,
-    Err(_) => String::from("api_server"),
+    Err(_) => panic!(" kube api server must be given"),
   };
 
   let kube_namespace = match env::var("KUBE_NAMESPACE") {
     Ok(val) => val,
-    Err(_) => String::from("namespace"),
+    Err(_) => panic!(" kube namespace must be given"),
   };
 
   let kube_token = match env::var("KUBE_TOKEN") {
     Ok(val) => val,
     Err(_) => String::from("token"),
+  };
+
+  let kube_tiller_ns = match env::var("KUBE_TILLER_NS") {
+    Ok(val) => val,
+    Err(_) => String::from("kube_tiller_ns"),
   };
 
   let current_path = match env::current_dir() {
@@ -53,5 +59,6 @@ pub fn get_config() -> Config {
     kube_api_server,
     kube_namespace,
     kube_token,
+    kube_tiller_ns
   }
 }
