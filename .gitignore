@@ -3,4 +3,4 @@
 .env
 
 # template
-kubeconfig.yaml
+kubeconfig

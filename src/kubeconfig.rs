@@ -21,12 +21,19 @@ pub fn render_kubeconfig(template: &String, variables: KubeConfigVariables) -> S
 }
 
 pub fn write_kubeconfig() -> io::Result<()> {
-  let Config { kubeconfig_template_path, kubeconfig_path, .. } = get_config();
+  let Config { 
+    kubeconfig_template_path,
+    kubeconfig_path,
+    kube_api_server,
+    kube_namespace,
+    kube_token,
+    .. 
+  } = get_config();
 
   let variables = KubeConfigVariables {
-    api_server: String::from("api_server"),
-    namespace: String::from("namespace"),
-    token: String::from("token")
+    api_server: kube_api_server,
+    namespace: kube_namespace,
+    token: kube_token
   };
 
   let template_string = read_to_string(&kubeconfig_template_path)?;
