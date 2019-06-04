@@ -1,5 +1,6 @@
 use handlebars::Handlebars;
-use std::fs::{write, read_to_string};
+use std::fs::{write, read_to_string, create_dir};
+use std::path::Path;
 use std::io;
 use crate::config::{get_config, Config};
 
@@ -38,6 +39,13 @@ pub fn write_kubeconfig() -> io::Result<()> {
 
   let template_string = read_to_string(&kubeconfig_template_path)?;
   let result = render_kubeconfig(&template_string, variables);
+
+  let parent = match Path::new(kubeconfig_destination).parent() {
+    Some(path) => path,
+    None => ""
+  };
+
+  create_dir(parent)
 
   write(&kubeconfig_destination, result)
 }

@@ -18,13 +18,17 @@ mod routes;
 mod config;
 mod response;
 mod kubeconfig;
+mod helm_command;
 
 use routes::root;
 use routes::webhook;
 use kubeconfig::{write_kubeconfig};
+use helm_command::{helm_init, helm_version};
 
 fn init() {
   write_kubeconfig();
+  helm_version();
+  helm_init();
 }
 
 fn main() {
