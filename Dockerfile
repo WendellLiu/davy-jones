@@ -13,12 +13,11 @@ RUN set -ex \
   && tar -zxvf /tmp/${FILENAME} -C /tmp \
   && mv /tmp/linux-amd64/helm /bin/helm \
   && chmod +x /tmp/kubectl \
-  && mv /tmp/kubectl /bin/kubectl \
-  && rm -rf /tmp 
+  && mv /tmp/kubectl /bin/kubectl
 
 COPY ./ /app
 WORKDIR /app
 
 RUN cargo build --release --features "production"
 
-CMD [ "ROCKET_SECRET_KEY=${ROCKET_SECRET_KEY} ./target/release/davi-jones" ]
+CMD ROCKET_SECRET_KEY=${ROCKET_SECRET_KEY} ./target/release/davy-jones
