@@ -23,7 +23,7 @@ pub fn render_kubeconfig(template: &String, variables: KubeConfigVariables) -> S
 pub fn write_kubeconfig() -> io::Result<()> {
   let Config { 
     kubeconfig_template_path,
-    kubeconfig_path,
+    kubeconfig_destination,
     kube_api_server,
     kube_namespace,
     kube_token,
@@ -39,5 +39,5 @@ pub fn write_kubeconfig() -> io::Result<()> {
   let template_string = read_to_string(&kubeconfig_template_path)?;
   let result = render_kubeconfig(&template_string, variables);
 
-  write(&kubeconfig_path, result)
+  write(&kubeconfig_destination, result)
 }

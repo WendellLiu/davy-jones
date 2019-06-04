@@ -5,7 +5,7 @@ use std::env;
 pub struct Config {
   pub secret: String,
   pub kubeconfig_template_path: String,
-  pub kubeconfig_path: String,
+  pub kubeconfig_destination: String,
   pub kube_api_server: String,
   pub kube_namespace: String,
   pub kube_token: String,
@@ -35,11 +35,21 @@ pub fn get_config() -> Config {
     Err(_) => String::from("token"),
   };
 
+  let current_path = match env::current_dir() {
+    Ok(path) => format!("{}", path.display()),
+    _ => String::from("/tmp")
+  };
+
+  let kubeconfig_destination = match cfg!(feature = "production") {
+    true => String::from("/root/.kube/config"),
+    false => String::from(format!("{}/config", current_path)),
+  };
+
 
   Config {
     secret,
     kubeconfig_template_path: String::from("kubeconfig_template"),
-    kubeconfig_path: String::from("kubeconfig"),
+    kubeconfig_destination,
     kube_api_server,
     kube_namespace,
     kube_token,

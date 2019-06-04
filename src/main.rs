@@ -23,8 +23,13 @@ use routes::root;
 use routes::webhook;
 use kubeconfig::{write_kubeconfig};
 
-fn main() {
+fn init() {
   write_kubeconfig();
+}
+
+fn main() {
+  init();
+
   rocket::ignite()
     .mount("/", routes![root::index, webhook::index, webhook::create_token])
     .launch();
