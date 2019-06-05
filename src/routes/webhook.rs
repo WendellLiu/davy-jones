@@ -35,11 +35,11 @@ pub enum TriggerWebhookPayload {
 #[derive(Serialize, Deserialize)]
 pub struct TriggerWebhookData {
   release_name: String,
-  signature: WebhookSecret
+  signature: String
 }
 
 #[post("/webhook/<token>", format = "json", data = "<_payload>")]
-pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, signature: WebhookSecret) -> 
+pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, webhook_secret: WebhookSecret) -> 
   Result<Json<CustomResponse<TriggerWebhookData>>, BadRequest<String>> {
   let validation = Validation {
         validate_exp: false,
@@ -78,6 +78,7 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, signature:
     r_suf,
     repo,
     p_bran,
+    hd_secr,
     ..
   } = claims;
 
@@ -87,6 +88,12 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, signature:
 
   if is_protected_branch(&branch_name, p_bran) {
     return Err(BadRequest(Some(String::from("the branch is in the protected list"))));
+  }
+
+  let WebhookSecret(signature) = webhook_secret;
+
+  if signature != hd_secr {
+    return Err(BadRequest(Some(String::from("the secret does not match"))));
   }
 
   let release_name = concat_release(branch_name, r_pre, r_suf);
