@@ -19,6 +19,7 @@ mod config;
 mod response;
 mod kubeconfig;
 mod helm_command;
+mod utils;
 
 use routes::root;
 use routes::webhook;
@@ -35,6 +36,6 @@ fn main() {
   init();
 
   rocket::ignite()
-    .mount("/", routes![root::index, webhook::index, webhook::create_token])
+    .mount("/", routes![root::index, webhook::trigger_webhook, webhook::create_token])
     .launch();
 }

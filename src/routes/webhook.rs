@@ -5,10 +5,33 @@ use crate::claims::{Claims, create_claims};
 use crate::config::{get_config, Config};
 use crate::response::{CustomResponse};
 use crate::helm_command::{helm_delete};
+use crate::utils::{concat_release};
 
+#[derive(Serialize, Deserialize)]
+struct Repository {
+  name: String
+}
 
-#[post("/webhook/<token>")]
-pub fn index(token: &RawStr) -> Result<String, ()> {
+#[derive(Serialize, Deserialize)]
+pub struct DeletePayload {
+  r#ref: String,
+  ref_type: String,
+  repository: Repository
+}
+
+#[derive(Serialize, Deserialize)]
+struct PingPayload {
+  hook_id: u8
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum TriggerWebhookPayload {
+  DeletePayload,
+  PingPayload
+}
+
+#[post("/webhook/<token>", format = "json", data = "<_payload>")]
+pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>) -> Result<String, ()> {
   let validation = Validation {
         validate_exp: false,
         ..Default::default()
@@ -22,6 +45,12 @@ pub fn index(token: &RawStr) -> Result<String, ()> {
     ..
   } = config;
 
+  let DeletePayload {
+    r#ref: branch_name,
+    ref_type,
+    ..
+  } = _payload.into_inner();
+
   let token_data = decode::<Claims>(token.as_str(), secret.as_ref(), &validation);
 
   let claims = match token_data {
@@ -31,10 +60,12 @@ pub fn index(token: &RawStr) -> Result<String, ()> {
 
   let Claims {
     pg,
+    r_pre,
+    r_suf,
     ..
-  } = claims;
+  } = claims.clone();
 
-  helm_delete(kube_tiller_ns, kube_context, pg, String::from("test"));
+  helm_delete(kube_tiller_ns, kube_context, pg, concat_release(branch_name, r_pre, r_suf));
 
   Ok(format!("{}", claims))
 }
