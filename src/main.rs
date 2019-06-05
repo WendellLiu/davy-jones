@@ -20,6 +20,7 @@ mod response;
 mod kubeconfig;
 mod helm_command;
 mod utils;
+mod request_guard;
 
 use routes::root;
 use routes::webhook;

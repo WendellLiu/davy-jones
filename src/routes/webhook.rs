@@ -7,6 +7,7 @@ use crate::config::{get_config, Config};
 use crate::response::{CustomResponse};
 use crate::helm_command::{helm_delete};
 use crate::utils::{concat_release, is_protected_branch};
+use crate::request_guard::{WebhookSecret};
 
 #[derive(Serialize, Deserialize)]
 struct Repository {
@@ -33,11 +34,12 @@ pub enum TriggerWebhookPayload {
 
 #[derive(Serialize, Deserialize)]
 pub struct TriggerWebhookData {
-  release_name: String
+  release_name: String,
+  signature: WebhookSecret
 }
 
 #[post("/webhook/<token>", format = "json", data = "<_payload>")]
-pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>) -> 
+pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, signature: WebhookSecret) -> 
   Result<Json<CustomResponse<TriggerWebhookData>>, BadRequest<String>> {
   let validation = Validation {
         validate_exp: false,
@@ -91,7 +93,8 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>) ->
   helm_delete(kube_tiller_ns, kube_context, pg, release_name.clone());
 
   let data = TriggerWebhookData {
-    release_name
+    release_name,
+    signature
   };
 
   Ok(Json(CustomResponse {
