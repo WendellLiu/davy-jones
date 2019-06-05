@@ -4,9 +4,10 @@ use jwt::{decode, TokenData, Validation, encode, Header};
 use crate::claims::{Claims, create_claims};
 use crate::config::{get_config, Config};
 use crate::response::{CustomResponse};
+use crate::helm_command::{helm_delete};
 
 
-#[get("/webhook/<token>")]
+#[post("/webhook/<token>")]
 pub fn index(token: &RawStr) -> String {
   let validation = Validation {
         validate_exp: false,
@@ -21,10 +22,12 @@ pub fn index(token: &RawStr) -> String {
 
   let token_data = decode::<Claims>(token.as_str(), secret.as_ref(), &validation);
 
-  match token_data {
-    Ok(TokenData { claims, .. }) => format!("{}", claims),
-    Err(e) => format!("error = {:?}", e),
-  }
+  let claims = match token_data {
+    Ok(TokenData { claims: _claims, .. }) => _claims,
+    Err(e) => panic!(e),
+  };
+
+  format!("{}", claims)
 }
 
 #[derive(Serialize, Deserialize)]
