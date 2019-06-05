@@ -6,7 +6,7 @@ use crate::claims::{Claims, create_claims};
 use crate::config::{get_config, Config};
 use crate::response::{CustomResponse};
 use crate::helm_command::{helm_delete};
-use crate::utils::{concat_release};
+use crate::utils::{concat_release, is_protected_branch};
 
 #[derive(Serialize, Deserialize)]
 struct Repository {
@@ -83,6 +83,10 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>) ->
     return Err(BadRequest(Some(String::from("repository name does not match the payload"))));
   }
 
+  if is_protected_branch(&branch_name, p_bran) {
+    return Err(BadRequest(Some(String::from("the branch is in the protected list"))));
+  }
+
   let release_name = concat_release(branch_name, r_pre, r_suf);
   helm_delete(kube_tiller_ns, kube_context, pg, release_name.clone());
 
@@ -101,7 +105,7 @@ pub struct CreateTokenPayload {
   pub release_name_prefix: Option<String>,
   pub release_name_suffix: Option<String>,
   pub purge: bool,
-  pub protected_branch_name: Option<String>,
+  pub protected_branch_name: Option<Vec<String>>,
   pub repository_name: String,
   pub webhook_secret: String,
 }

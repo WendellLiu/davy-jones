@@ -40,3 +40,39 @@ mod concat_release_tests {
     );
   }
 }
+
+pub fn is_protected_branch(branch_name: &String, protected_branches: Option<Vec<String>>) -> bool {
+  match protected_branches {
+    Some(p_bran) => p_bran.contains(branch_name),
+    None => false
+  }
+}
+
+#[cfg(test)]
+mod is_protected_branch_tests {
+  use super::*;
+
+  #[test]
+  fn test_happy_case() {
+    assert_eq!(
+      is_protected_branch(&String::from("foo"), Some(vec![String::from("foo")])), 
+      true
+    );
+  }
+
+  #[test]
+  fn test_non_protected_branches() {
+    assert_eq!(
+      is_protected_branch(&String::from("foo"), None), 
+      false
+    );
+  }
+
+  #[test]
+  fn test_empty_protected_branches() {
+    assert_eq!(
+      is_protected_branch(&String::from("foo"), Some(vec![])), 
+      false
+    );
+  }
+}

@@ -10,7 +10,7 @@ pub struct Claims {
   // Purge or Not
   pub pg: bool,
   // Protected Branch Name
-  pub p_bran: Option<String>,
+  pub p_bran: Option<Vec<String>>,
   // Repository Name
   pub repo: String,
   // Issuer
@@ -44,7 +44,7 @@ pub fn create_claims(
   release_name_prefix: Option<String>,
   release_name_suffix: Option<String>,
   purge: bool,
-  protected_branch_name: Option<String>,
+  protected_branch_name: Option<Vec<String>>,
   repository_name: String,
   webhook_secret: String
 ) -> Claims {
