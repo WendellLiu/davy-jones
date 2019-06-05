@@ -8,7 +8,7 @@ use crate::helm_command::{helm_delete};
 
 
 #[post("/webhook/<token>")]
-pub fn index(token: &RawStr) -> String {
+pub fn index(token: &RawStr) -> Result<String, ()> {
   let validation = Validation {
         validate_exp: false,
         ..Default::default()
@@ -17,6 +17,8 @@ pub fn index(token: &RawStr) -> String {
   let config = get_config();
   let Config {
     secret,
+    kube_tiller_ns,
+    kube_context,
     ..
   } = config;
 
@@ -27,7 +29,14 @@ pub fn index(token: &RawStr) -> String {
     Err(e) => panic!(e),
   };
 
-  format!("{}", claims)
+  let Claims {
+    pg,
+    ..
+  } = claims;
+
+  helm_delete(kube_tiller_ns, kube_context, pg, String::from("test"));
+
+  Ok(format!("{}", claims))
 }
 
 #[derive(Serialize, Deserialize)]

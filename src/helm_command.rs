@@ -18,12 +18,12 @@ pub fn helm_version() {
   println!("{}", String::from_utf8_lossy(&command.stdout));
 }
 
-pub fn helm_delete(namespace: String, context: String, purge: bool, release_name: String) {
+pub fn helm_delete(tiller_ns: String, context: String, purge: bool, release_name: String) {
   let mut command = Command::new("helm");
   let command = command
     .arg("delete")
     .arg("--tiller-namespace")
-    .arg(namespace)
+    .arg(tiller_ns)
     .arg("--kube-context")
     .arg(context);
   
@@ -37,5 +37,6 @@ pub fn helm_delete(namespace: String, context: String, purge: bool, release_name
     .output()
     .expect("helm delete failed");
 
-  println!("{}", String::from_utf8_lossy(&output.stdout));
+  println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+  println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
 }

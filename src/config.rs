@@ -9,7 +9,8 @@ pub struct Config {
   pub kube_api_server: String,
   pub kube_namespace: String,
   pub kube_token: String,
-  pub kube_tiller_ns: String
+  pub kube_tiller_ns: String,
+  pub kube_context: String
 }
 
 pub fn get_config() -> Config {
@@ -41,6 +42,11 @@ pub fn get_config() -> Config {
     Err(_) => String::from("kube_tiller_ns"),
   };
 
+  let kube_context = match env::var("KUBE_CONTEXT") {
+    Ok(val) => val,
+    Err(_) => String::from("kube_context"),
+  };
+
   let current_path = match env::current_dir() {
     Ok(path) => format!("{}", path.display()),
     _ => String::from("/tmp")
@@ -59,6 +65,7 @@ pub fn get_config() -> Config {
     kube_api_server,
     kube_namespace,
     kube_token,
-    kube_tiller_ns
+    kube_tiller_ns,
+    kube_context
   }
 }
