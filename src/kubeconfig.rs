@@ -40,12 +40,11 @@ pub fn write_kubeconfig() -> io::Result<()> {
   let template_string = read_to_string(&kubeconfig_template_path)?;
   let result = render_kubeconfig(&template_string, variables);
 
-  let parent = match Path::new(kubeconfig_destination).parent() {
-    Some(path) => path,
-    None => ""
+  let parent = Path::new(&kubeconfig_destination).parent();
+  match parent {
+    Some(path) => create_dir(path),
+    None => Ok(())
   };
-
-  create_dir(parent)
 
   write(&kubeconfig_destination, result)
 }

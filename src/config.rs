@@ -48,7 +48,7 @@ pub fn get_config() -> Config {
 
   let kubeconfig_destination = match cfg!(feature = "production") {
     true => String::from("/root/.kube/config"),
-    false => String::from(format!("{}/config", current_path)),
+    false => String::from(format!("{}/.kube/config", current_path)),
   };
 
 
