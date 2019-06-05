@@ -1,7 +1,16 @@
 http://localhost:8000 
 
 ###
-POST http://localhost:8000/webhook/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyX3ByZSI6ImN3ZWIiLCJyX3N1ZiI6bnVsbCwicGciOnRydWUsInBfYnJhbiI6Im1hc3RlciIsInJlcG8iOiJjd2ViIiwiaXNzIjoiZGF2eS1qb25lcyIsImlhdCI6IjIwMTktMDUtMjhUMTc6MTI6MDkuNDE1MDA1WiIsImhkX3NlY3IiOiJzZWNyZXQifQ.1E0ys8TPnOQB7ORJ_46xqcziUK_IPf7MLFxDvpQ-gpQ  http/1.1
+POST http://localhost:8000/webhook/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyX3ByZSI6ImN3ZWItIiwicl9zdWYiOiIiLCJwZyI6dHJ1ZSwicF9icmFuIjpudWxsLCJyZXBvIjoiaG9uZXN0YmVlL2N3ZWIiLCJpc3MiOiJkYXZ5LWpvbmVzIiwiaWF0IjoiMjAxOS0wNi0wNVQxMzozNzowNi40MjYyOTQzNjdaIiwiaGRfc2VjciI6IjJ3c3gifQ.STZqBeB7LdHvhwvGVxrNLuH1nlsfeJtiLtLYbG1fuHE  http/1.1
+content-type: application/json
+
+{
+  "ref": "test",
+  "ref_type": "branch",
+  "repository": {
+    "full_name": "honestbee/cweb"
+  }
+}
 
 ###
 POST http://localhost:8000/webhook http/1.1
@@ -12,6 +21,6 @@ content-type: application/json
   "release_name_suffix": "",
   "purge": true,
   "protected_branch_name": null,
-  "repository_name": "Consumer-Web",
+  "repository_name": "honestbee/cweb",
   "webhook_secret": "2wsx"
 }

@@ -1,7 +1,7 @@
 use chrono::Utc;
 use serde_derive::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize)]
 pub struct Claims {
   // Release Name Prefix
   pub r_pre: Option<String>,

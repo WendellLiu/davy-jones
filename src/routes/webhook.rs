@@ -1,4 +1,5 @@
 use rocket::http::RawStr;
+use  rocket::response::status::{BadRequest};
 use rocket_contrib::json::{Json};
 use jwt::{decode, TokenData, Validation, encode, Header};
 use crate::claims::{Claims, create_claims};
@@ -9,7 +10,7 @@ use crate::utils::{concat_release};
 
 #[derive(Serialize, Deserialize)]
 struct Repository {
-  name: String
+  full_name: String
 }
 
 #[derive(Serialize, Deserialize)]
@@ -30,8 +31,14 @@ pub enum TriggerWebhookPayload {
   PingPayload
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct TriggerWebhookData {
+  release_name: String
+}
+
 #[post("/webhook/<token>", format = "json", data = "<_payload>")]
-pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>) -> Result<String, ()> {
+pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>) -> 
+  Result<Json<CustomResponse<TriggerWebhookData>>, BadRequest<String>> {
   let validation = Validation {
         validate_exp: false,
         ..Default::default()
@@ -48,8 +55,13 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>) -> Result<
   let DeletePayload {
     r#ref: branch_name,
     ref_type,
+    repository,
     ..
   } = _payload.into_inner();
+
+  if ref_type != "branch" {
+    return Err(BadRequest(Some(String::from("the ref type is not branch"))));
+  }
 
   let token_data = decode::<Claims>(token.as_str(), secret.as_ref(), &validation);
 
@@ -62,12 +74,26 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>) -> Result<
     pg,
     r_pre,
     r_suf,
+    repo,
+    p_bran,
     ..
-  } = claims.clone();
+  } = claims;
 
-  helm_delete(kube_tiller_ns, kube_context, pg, concat_release(branch_name, r_pre, r_suf));
+  if repo != repository.full_name {
+    return Err(BadRequest(Some(String::from("repository name does not match the payload"))));
+  }
 
-  Ok(format!("{}", claims))
+  let release_name = concat_release(branch_name, r_pre, r_suf);
+  helm_delete(kube_tiller_ns, kube_context, pg, release_name.clone());
+
+  let data = TriggerWebhookData {
+    release_name
+  };
+
+  Ok(Json(CustomResponse {
+      status: String::from("ok"),
+      data
+  }))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -87,7 +113,7 @@ pub struct CreateTokenData {
 
 #[post("/webhook", format = "json", data = "<_payload>")]
 pub fn create_token(_payload: Json<CreateTokenPayload>) -> 
-  Option<Json<CustomResponse<CreateTokenData>>> {
+  Result<Json<CustomResponse<CreateTokenData>>, BadRequest<String>> {
     let payload = _payload.into_inner();
     let claims = create_claims(
       payload.release_name_prefix, 
@@ -109,8 +135,8 @@ pub fn create_token(_payload: Json<CreateTokenPayload>) ->
       token: token
     };
 
-    Some(Json(CustomResponse {
+    Ok(Json(CustomResponse {
       status: String::from("ok"),
-      data: data
+      data
     }))
   }
