@@ -3,7 +3,7 @@ http://localhost:8000
 ###
 POST http://localhost:8000/webhook/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyX3ByZSI6ImN3ZWItIiwicl9zdWYiOiIiLCJwZyI6dHJ1ZSwicF9icmFuIjpbIm1hc3RlciJdLCJyZXBvIjoiaG9uZXN0YmVlL2N3ZWIiLCJpc3MiOiJkYXZ5LWpvbmVzIiwiaWF0IjoiMjAxOS0wNi0wNVQxNzoxODoyMS45NDM4NjE0MDBaIiwiaGRfc2VjciI6IjJ3c3gifQ.2F06gqtq05OHWhaUiTTbE5fFpjUGIt1LgVwNB-N7QBQ  http/1.1
 content-type: application/json
-X-Hub-Signature: 123
+X-Hub-Signature: 2wsx
 
 {
   "ref": "test",
@@ -11,6 +11,15 @@ X-Hub-Signature: 123
   "repository": {
     "full_name": "honestbee/cweb"
   }
+}
+
+###
+POST http://localhost:8000/webhook/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyX3ByZSI6ImN3ZWItIiwicl9zdWYiOiIiLCJwZyI6dHJ1ZSwicF9icmFuIjpbIm1hc3RlciJdLCJyZXBvIjoiaG9uZXN0YmVlL2N3ZWIiLCJpc3MiOiJkYXZ5LWpvbmVzIiwiaWF0IjoiMjAxOS0wNi0wNVQxNzoxODoyMS45NDM4NjE0MDBaIiwiaGRfc2VjciI6IjJ3c3gifQ.2F06gqtq05OHWhaUiTTbE5fFpjUGIt1LgVwNB-N7QBQ http/1.1
+content-type: application/json
+X-GitHub-Event: ping
+
+{
+  "hook_id": 123
 }
 
 ###

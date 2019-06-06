@@ -37,6 +37,6 @@ fn main() {
   init();
 
   rocket::ignite()
-    .mount("/", routes![root::index, webhook::trigger_webhook, webhook::create_token])
+    .mount("/", routes![root::index, webhook::trigger_webhook, webhook::ping_webhook, webhook::create_token])
     .launch();
 }

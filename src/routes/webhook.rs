@@ -22,7 +22,7 @@ pub struct DeletePayload {
 }
 
 #[derive(Serialize, Deserialize)]
-struct PingPayload {
+pub struct PingPayload {
   hook_id: u8
 }
 
@@ -37,6 +37,7 @@ pub struct TriggerWebhookData {
   release_name: String,
   signature: String
 }
+
 
 #[post("/webhook/<token>", format = "json", data = "<_payload>")]
 pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, webhook_secret: WebhookSecret) -> 
@@ -109,6 +110,15 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, webhook_se
       data
   }))
 }
+
+#[post("/webhook/<_token>", format = "json", data = "<_payload>", rank = 2)]
+pub fn ping_webhook(_token: &RawStr, _payload: Json<PingPayload>) -> 
+  Result<Json<CustomResponse<()>>, BadRequest<String>> {
+    Ok(Json(CustomResponse {
+      status: String::from("ok"),
+      data: ()
+    }))
+  }
 
 #[derive(Serialize, Deserialize)]
 pub struct CreateTokenPayload {
