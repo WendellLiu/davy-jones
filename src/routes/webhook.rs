@@ -23,7 +23,7 @@ pub struct DeletePayload {
 
 #[derive(Serialize, Deserialize)]
 pub struct PingPayload {
-  hook_id: u8
+  hook_id: i32
 }
 
 #[derive(Serialize, Deserialize)]
@@ -94,6 +94,7 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, webhook_se
   let WebhookSecret(signature) = webhook_secret;
 
   if signature != hd_secr {
+    println!("signature: {}", signature);
     return Err(BadRequest(Some(String::from("the secret does not match"))));
   }
 

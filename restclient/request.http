@@ -34,6 +34,6 @@ content-type: application/json
   "release_name_suffix": "",
   "purge": true,
   "protected_branch_name": ["master"],
-  "repository_name": "honestbee/cweb",
-  "webhook_secret": "2wsx"
+  "repository_name": "WendellLiu/davy-jones",
+  "webhook_secret": "1qaz2wsx"
 }
