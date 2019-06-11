@@ -87,7 +87,7 @@ pub fn verify_signature(key: &String, message: &String, signature: &String) -> b
   mac.input(message.as_bytes());
   let result = mac.result();
   let code = result.code();
-  let code = code.iter().format_with("", |byte, f| f(&format_args!("{:02x}", byte))).to_string();
+  let code = String::from("sha1=") + &code.iter().format_with("", |byte, f| f(&format_args!("{:02x}", byte))).to_string();
   &code == signature
 }
 
@@ -96,7 +96,7 @@ mod verify_signature_tests {
   use super::*;
   const BODY_CONTENT: &str = "bodystring";
   const KEY: &str = "secret_key";
-  const COMPUTED_HMAC: &str = "97049623b0e5d20bf6beb5313d80600e3d6abe56";
+  const COMPUTED_HMAC: &str = "sha1=97049623b0e5d20bf6beb5313d80600e3d6abe56";
 
   #[test]
   fn test_happy_case() {
