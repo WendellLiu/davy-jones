@@ -8,19 +8,7 @@ use crate::config::{get_config, Config};
 use crate::response::{CustomResponse};
 use crate::helm_command::{helm_delete};
 use crate::utils::{concat_release, is_protected_branch, verify_signature};
-use crate::request_guard::{WebhookSecret};
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Repository {
-  full_name: String
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct DeletePayload {
-  r#ref: String,
-  ref_type: String,
-  repository: Repository
-}
+use crate::data_guard::{DeletePayload};
 
 #[derive(Serialize, Deserialize)]
 pub struct PingPayload {
@@ -35,13 +23,12 @@ pub enum TriggerWebhookPayload {
 
 #[derive(Serialize, Deserialize)]
 pub struct TriggerWebhookData {
-  release_name: String,
-  signature: String
+  release_name: String
 }
 
 
 #[post("/webhook/<token>", format = "json", data = "<_payload>")]
-pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, webhook_secret: WebhookSecret) -> 
+pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>) -> 
   Result<Json<CustomResponse<TriggerWebhookData>>, BadRequest<String>> {
   let validation = Validation {
         validate_exp: false,
@@ -73,7 +60,7 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, webhook_se
     ..
   } = claims;
 
-  let WebhookSecret(signature) = webhook_secret;
+  // let WebhookSecret(signature) = webhook_secret;
 
   let payload = _payload.into_inner();
   let payload_string = match to_string(&payload){
@@ -81,9 +68,9 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, webhook_se
     Err(e) => panic!(e)
   };
 
-  if !verify_signature(&hd_secr, &payload_string, &signature) {
-    return Err(BadRequest(Some(String::from("the secret does not match"))));
-  }
+  // if !verify_signature(&hd_secr, &payload_string, &signature) {
+  //   return Err(BadRequest(Some(String::from("the secret does not match"))));
+  // }
 
   let DeletePayload {
     r#ref: branch_name,
@@ -108,8 +95,7 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, webhook_se
   helm_delete(kube_tiller_ns, kube_context, pg, release_name.clone());
 
   let data = TriggerWebhookData {
-    release_name,
-    signature
+    release_name
   };
 
   Ok(Json(CustomResponse {
