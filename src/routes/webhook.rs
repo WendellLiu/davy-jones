@@ -1,7 +1,8 @@
 use rocket::http::RawStr;
-use  rocket::response::status::{BadRequest};
+use rocket::response::status::{BadRequest};
 use rocket_contrib::json::{Json};
 use jwt::{decode, TokenData, Validation, encode, Header};
+use serde_json::to_string;
 use crate::claims::{Claims, create_claims};
 use crate::config::{get_config, Config};
 use crate::response::{CustomResponse};
@@ -74,7 +75,13 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, webhook_se
 
   let WebhookSecret(signature) = webhook_secret;
 
-  if !verify_signature(&hd_secr, &format!("{:?}", _payload), &signature) {
+  let payload = _payload.into_inner();
+  let payload_string = match to_string(&payload){
+    Ok(s) => s,
+    Err(e) => panic!(e)
+  };
+
+  if !verify_signature(&hd_secr, &payload_string, &signature) {
     return Err(BadRequest(Some(String::from("the secret does not match"))));
   }
 
@@ -83,7 +90,7 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, webhook_se
     ref_type,
     repository,
     ..
-  } = _payload.into_inner();
+  } = payload;
 
   if ref_type != "branch" {
     return Err(BadRequest(Some(String::from("the ref type is not branch"))));

@@ -6,6 +6,7 @@ extern crate jsonwebtoken as jwt;
 #[macro_use] extern crate rocket;
 #[macro_use] extern crate serde_derive;
 #[macro_use] extern crate serde_json;
+extern crate pretty_env_logger;
 extern crate rocket_contrib;
 extern crate handlebars;
 extern crate crypto;
@@ -36,6 +37,8 @@ fn init() {
 }
 
 fn main() {
+  pretty_env_logger::init();
+
   init();
 
   rocket::ignite()
