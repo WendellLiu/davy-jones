@@ -9,6 +9,7 @@ use crate::response::{CustomResponse};
 use crate::helm_command::{helm_delete};
 use crate::utils::{concat_release, is_protected_branch, verify_signature};
 use crate::data_guard::{DeletePayload};
+use crate::request_guard::{GithubEvent};
 
 #[derive(Serialize, Deserialize)]
 pub struct PingPayload {
@@ -27,13 +28,13 @@ pub struct TriggerWebhookData {
 }
 
 
-#[post("/webhook/<token>", format = "json", data = "<_payload>")]
-pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>) -> 
+#[post("/webhook/<token>", format = "json", data = "<payload>")]
+pub fn trigger_webhook(token: &RawStr, payload: DeletePayload, webhook_secret: GithubEvent) -> 
   Result<Json<CustomResponse<TriggerWebhookData>>, BadRequest<String>> {
   let validation = Validation {
-        validate_exp: false,
-        ..Default::default()
-    };
+    validate_exp: false,
+    ..Default::default()
+  };
 
   let config = get_config();
   let Config {
@@ -60,9 +61,6 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>) ->
     ..
   } = claims;
 
-  // let WebhookSecret(signature) = webhook_secret;
-
-  let payload = _payload.into_inner();
   let payload_string = match to_string(&payload){
     Ok(s) => s,
     Err(e) => panic!(e)

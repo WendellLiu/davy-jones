@@ -3,7 +3,7 @@ http://localhost:8000
 ###
 POST http://localhost:8000/webhook/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyX3ByZSI6ImN3ZWItIiwicl9zdWYiOiIiLCJwZyI6dHJ1ZSwicF9icmFuIjpbIm1hc3RlciJdLCJyZXBvIjoiaG9uZXN0YmVlL2N3ZWIiLCJpc3MiOiJkYXZ5LWpvbmVzIiwiaWF0IjoiMjAxOS0wNi0wNVQxNzoxODoyMS45NDM4NjE0MDBaIiwiaGRfc2VjciI6IjJ3c3gifQ.2F06gqtq05OHWhaUiTTbE5fFpjUGIt1LgVwNB-N7QBQ  http/1.1
 content-type: application/json
-X-Hub-Signature: 4f3560691e536540dcc560c8f15d80419548749a
+X-Hub-Signature: sha1=4f3560691e536540dcc560c8f15d80419548749a
 X-GitHub-Event: delete
 
 

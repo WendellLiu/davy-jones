@@ -23,6 +23,7 @@ mod response;
 mod kubeconfig;
 mod helm_command;
 mod utils;
+mod request_guard;
 mod data_guard;
 
 use routes::root;
