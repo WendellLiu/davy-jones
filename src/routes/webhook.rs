@@ -2,12 +2,11 @@ use rocket::http::RawStr;
 use rocket::response::status::{BadRequest};
 use rocket_contrib::json::{Json};
 use jwt::{decode, TokenData, Validation, encode, Header};
-use serde_json::to_string;
 use crate::claims::{Claims, create_claims};
 use crate::config::{get_config, Config};
 use crate::response::{CustomResponse};
 use crate::helm_command::{helm_delete};
-use crate::utils::{concat_release, is_protected_branch, verify_signature};
+use crate::utils::{concat_release, is_protected_branch};
 use crate::data_guard::{DeletePayload};
 use crate::request_guard::{GithubEvent};
 
@@ -29,7 +28,7 @@ pub struct TriggerWebhookData {
 
 
 #[post("/webhook/<token>", format = "json", data = "<payload>")]
-pub fn trigger_webhook(token: &RawStr, payload: DeletePayload, webhook_secret: GithubEvent) -> 
+pub fn trigger_webhook(token: &RawStr, payload: DeletePayload, _github_event: GithubEvent) -> 
   Result<Json<CustomResponse<TriggerWebhookData>>, BadRequest<String>> {
   let validation = Validation {
     validate_exp: false,
@@ -57,18 +56,8 @@ pub fn trigger_webhook(token: &RawStr, payload: DeletePayload, webhook_secret: G
     r_suf,
     repo,
     p_bran,
-    hd_secr,
     ..
   } = claims;
-
-  let payload_string = match to_string(&payload){
-    Ok(s) => s,
-    Err(e) => panic!(e)
-  };
-
-  // if !verify_signature(&hd_secr, &payload_string, &signature) {
-  //   return Err(BadRequest(Some(String::from("the secret does not match"))));
-  // }
 
   let DeletePayload {
     r#ref: branch_name,

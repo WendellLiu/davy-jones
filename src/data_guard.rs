@@ -1,12 +1,16 @@
+use std::str::from_utf8;
 use rocket::{Request, Data, Outcome};
 use rocket::data::{self, FromDataSimple};
 use rocket::http::Status;
-use std::str::from_utf8;
+use jwt::{decode, TokenData, Validation};
+use crate::config::{get_config, Config};
+use crate::claims::{Claims};
+
+
 
 use crate::utils::{verify_signature};
 
 const HUB_SIGNATURE: &str = "X-Hub-Signature";
-const X_GITHUB_EVENT: &str = "X-GitHub-Event";
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Repository {
@@ -29,13 +33,43 @@ impl FromDataSimple for DeletePayload {
       None => return Outcome::Failure((Status::BadRequest, String::from("no signature")))
     };
 
-    // let claims = request.get_param(0);
+    let validation = Validation {
+      validate_exp: false,
+      ..Default::default()
+    };
 
-    // if !verify_signature(&hd_secr, &data, &signature) {
-    //   return Err(BadRequest(Some(String::from("the secret does not match"))));
-    // }
+    let config = get_config();
+    let Config {
+      secret,
+      ..
+    } = config;
+
+    let token: String = match request.get_param(1) {
+      Some(r) => r.unwrap(),
+      None => return Outcome::Failure((Status::BadRequest, String::from("can not fetch params")))
+    };
+
+    println!("token: {}", token);
+
+    let token_data = decode::<Claims>(token.as_str(), secret.as_ref(), &validation);
+
+    let claims = match token_data {
+      Ok(TokenData { claims: _claims, .. }) => _claims,
+      Err(e) => panic!(e),
+    };
+
+    let Claims {
+      hd_secr,
+      ..
+    } = claims;
 
     let data_string = from_utf8(data.peek()).unwrap();
+
+
+    if !verify_signature(&hd_secr, &String::from(data_string), &String::from(signature)) {
+      return Outcome::Failure((Status::BadRequest, String::from("the secret does not match")));
+    }
+
     Outcome::Success(serde_json::from_str(data_string).unwrap())
   }
 }

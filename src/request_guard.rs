@@ -3,7 +3,6 @@ use rocket::http::Status;
 use rocket::request::{Request, FromRequest};
 use rocket::request;
 
-const HUB_SIGNATURE: &str = "X-Hub-Signature";
 const X_GITHUB_EVENT: &str = "X-GitHub-Event";
 
 #[derive(Serialize, Deserialize)]
