@@ -83,16 +83,11 @@ mod is_protected_branch_tests {
 }
 
 pub fn verify_signature(key: &String, message: &String, signature: &String) -> bool {
-  println!("key: {}", key);
-  println!("message: {}", message);
-
   let mut mac= Hmac::new(Sha1::new(), key.as_bytes());
   mac.input(message.as_bytes());
   let result = mac.result();
   let code = result.code();
   let code = String::from("sha1=") + &code.iter().format_with("", |byte, f| f(&format_args!("{:02x}", byte))).to_string();
-  println!("code: {}", code);
-  println!("signature: {}", signature);
   &code == signature
 }
 

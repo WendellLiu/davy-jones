@@ -1,4 +1,4 @@
-use std::str::from_utf8;
+use std::io::Read;
 use rocket::{Request, Data, Outcome};
 use rocket::data::{self, FromDataSimple};
 use rocket::http::Status;
@@ -63,13 +63,16 @@ impl FromDataSimple for DeletePayload {
       ..
     } = claims;
 
-    let data_string = from_utf8(data.peek()).unwrap();
+    let mut stream = data.open();
+    let mut data_string = String::new();
+
+    stream.read_to_string(&mut data_string);
 
 
-    if !verify_signature(&hd_secr, &String::from(data_string), &String::from(signature)) {
+    if !verify_signature(&hd_secr, &String::from(&data_string), &String::from(signature)) {
       return Outcome::Failure((Status::BadRequest, String::from("the secret does not match")));
     }
 
-    Outcome::Success(serde_json::from_str(data_string).unwrap())
+    Outcome::Success(serde_json::from_str(&data_string).unwrap())
   }
 }
