@@ -6,15 +6,15 @@ use crate::claims::{Claims, create_claims};
 use crate::config::{get_config, Config};
 use crate::response::{CustomResponse};
 use crate::helm_command::{helm_delete};
-use crate::utils::{concat_release, is_protected_branch};
+use crate::utils::{concat_release, is_protected_branch, verify_signature};
 use crate::request_guard::{WebhookSecret};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 struct Repository {
   full_name: String
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DeletePayload {
   r#ref: String,
   ref_type: String,
@@ -55,17 +55,6 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, webhook_se
     ..
   } = config;
 
-  let DeletePayload {
-    r#ref: branch_name,
-    ref_type,
-    repository,
-    ..
-  } = _payload.into_inner();
-
-  if ref_type != "branch" {
-    return Err(BadRequest(Some(String::from("the ref type is not branch"))));
-  }
-
   let token_data = decode::<Claims>(token.as_str(), secret.as_ref(), &validation);
 
   let claims = match token_data {
@@ -83,19 +72,29 @@ pub fn trigger_webhook(token: &RawStr, _payload: Json<DeletePayload>, webhook_se
     ..
   } = claims;
 
+  let WebhookSecret(signature) = webhook_secret;
+
+  if !verify_signature(&hd_secr, &format!("{:?}", _payload), &signature) {
+    return Err(BadRequest(Some(String::from("the secret does not match"))));
+  }
+
+  let DeletePayload {
+    r#ref: branch_name,
+    ref_type,
+    repository,
+    ..
+  } = _payload.into_inner();
+
+  if ref_type != "branch" {
+    return Err(BadRequest(Some(String::from("the ref type is not branch"))));
+  }
+
   if repo != repository.full_name {
     return Err(BadRequest(Some(String::from("repository name does not match the payload"))));
   }
 
   if is_protected_branch(&branch_name, p_bran) {
     return Err(BadRequest(Some(String::from("the branch is in the protected list"))));
-  }
-
-  let WebhookSecret(signature) = webhook_secret;
-
-  if signature != hd_secr {
-    println!("signature: {}", signature);
-    return Err(BadRequest(Some(String::from("the secret does not match"))));
   }
 
   let release_name = concat_release(branch_name, r_pre, r_suf);

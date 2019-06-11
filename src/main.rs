@@ -8,6 +8,8 @@ extern crate jsonwebtoken as jwt;
 #[macro_use] extern crate serde_json;
 extern crate rocket_contrib;
 extern crate handlebars;
+extern crate crypto;
+extern crate itertools;
 
 
 #[cfg(not(feature = "production"))]
