@@ -42,8 +42,8 @@ pub fn write_kubeconfig() -> io::Result<()> {
 
   let parent = Path::new(&kubeconfig_destination).parent();
   match parent {
-    Some(path) => create_dir(path),
-    None => Ok(())
+    Some(path) => create_dir(path)?,
+    None => ()
   };
 
   write(&kubeconfig_destination, result)

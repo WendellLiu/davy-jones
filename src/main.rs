@@ -32,7 +32,10 @@ use kubeconfig::{write_kubeconfig};
 use helm_command::{helm_init, helm_version};
 
 fn init() {
-  write_kubeconfig();
+  match write_kubeconfig() {
+    Err(e) => panic!(e),
+    _ => ()
+  };
   helm_version();
   helm_init();
 }

@@ -64,7 +64,10 @@ impl FromDataSimple for DeletePayload {
     let mut stream = data.open();
     let mut data_string = String::new();
 
-    stream.read_to_string(&mut data_string);
+    match stream.read_to_string(&mut data_string) {
+      Err(e) => panic!(e),
+      _ => ()
+    };
 
 
     if !verify_signature(&hd_secr, &String::from(&data_string), &String::from(signature)) {
