@@ -49,8 +49,6 @@ impl FromDataSimple for DeletePayload {
       None => return Outcome::Failure((Status::BadRequest, String::from("can not fetch params")))
     };
 
-    println!("token: {}", token);
-
     let token_data = decode::<Claims>(token.as_str(), secret.as_ref(), &validation);
 
     let claims = match token_data {
