@@ -53,7 +53,7 @@ impl FromDataSimple for DeletePayload {
 
     let claims = match token_data {
       Ok(TokenData { claims: _claims, .. }) => _claims,
-      Err(e) => panic!(e),
+      Err(e) => panic!(e.to_string()),
     };
 
     let Claims {
@@ -65,7 +65,7 @@ impl FromDataSimple for DeletePayload {
     let mut data_string = String::new();
 
     match stream.read_to_string(&mut data_string) {
-      Err(e) => panic!(e),
+      Err(e) => panic!(e.to_string()),
       _ => ()
     };
 

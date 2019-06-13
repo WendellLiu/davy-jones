@@ -47,7 +47,7 @@ pub fn trigger_webhook(token: &RawStr, payload: DeletePayload, _github_event: Gi
 
   let claims = match token_data {
     Ok(TokenData { claims: _claims, .. }) => _claims,
-    Err(e) => panic!(e),
+    Err(e) => panic!(e.to_string()),
   };
 
   let Claims {

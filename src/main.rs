@@ -33,7 +33,7 @@ use helm_command::{helm_init, helm_version};
 
 fn init() {
   match write_kubeconfig() {
-    Err(e) => panic!(e),
+    Err(e) => panic!(e.to_string()),
     _ => ()
   };
   helm_version();
